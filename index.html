@@ -406,7 +406,7 @@ function renderCards(){
         <span class="rarity-badge ${rClass(c.r)}">${c.r}</span>
         <div class="card-add">
           <span class="${tagClass}" id="p-${key}">${tagText}</span>
-          <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${currentSet}')">Add</button>
+          <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${currentSet}','Singles')">Add</button>
         </div>
       </div></div>`;
   }).join('')}</div>`;
@@ -426,10 +426,17 @@ function onSearch(){
 }
 
 // ── Cart ──
-function addToCart(key,en,jp,r,n,setId){
+function addToCart(key,en,jp,r,n,setId,productType,psaGrade,psaCert){
   const price = getPrice(key, r);
-  if(cart[key]) cart[key].qty++;
-  else cart[key]={en,jp,r,n,setId,price,qty:1};
+  if(cart[key]){ cart[key].qty++; }
+  else {
+    cart[key]={
+      en,jp,r,n,setId,price,qty:1,
+      productType: productType||'Singles',
+      psaGrade: psaGrade||'',
+      psaCert:  psaCert||'',
+    };
+  }
   renderCart();
 }
 
@@ -500,14 +507,17 @@ async function submitOrder(){
 
   const totalUSD = keys.reduce((s,k)=>s+cart[k].price*cart[k].qty, 0);
   const items = keys.map(k=>({
-    setId:   cart[k].setId,
-    number:  cart[k].n,
-    nameEn:  cart[k].en,
-    nameJp:  cart[k].jp,
-    rarity:  cart[k].r,
-    qty:     cart[k].qty,
-    priceUSD:cart[k].price,
-    lineTotalUSD: +(cart[k].price * cart[k].qty).toFixed(2),
+    productType: cart[k].productType || 'Singles',
+    setId:       cart[k].setId,
+    number:      cart[k].n,
+    nameEn:      cart[k].en,
+    nameJp:      cart[k].jp,
+    rarity:      cart[k].r,
+    qty:         cart[k].qty,
+    priceUSD:    cart[k].price,
+    lineTotalUSD:+(cart[k].price * cart[k].qty).toFixed(2),
+    psaGrade:    cart[k].psaGrade || '',
+    psaCert:     cart[k].psaCert  || '',
   }));
 
   const payload = { buyer, company, email, currency: cur, totalUSD: +totalUSD.toFixed(2), items };
@@ -582,7 +592,7 @@ function renderGlobalSearch(){
         <span class="rarity-badge ${rClass(c.r)}">${c.r}</span>
         <div class="card-add">
           <span class="${tagClass}">${sym}${conv(price)}</span>
-          <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${c.setId}')">Add</button>
+          <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${c.setId}','Singles')">Add</button>
         </div>
       </div></div>`;
   }).join('')}</div>`;
@@ -631,7 +641,7 @@ function renderBoxes(){
         <span class="rarity-badge r-Rare">BOX</span>
         <div class="card-add">
           <span class="${tagClass}">${tagText}</span>
-          <button class="add-btn" onclick="addToCart('${key}','${b.name_en}','${b.name_jp}','BOX','—','${b.set_id||'BOX'}')">Add</button>
+          <button class="add-btn" onclick="addToCart('${key}','${b.name_en}','${b.name_jp}','BOX','—','${b.set_id||'BOX'}','BOX')">Add</button>
         </div>
       </div></div>`;
   }).join('')}</div>`;
