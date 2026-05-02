@@ -67,9 +67,10 @@ button,input,select{font-family:inherit;font-size:inherit}
 .main-header p{font-size:12px;color:var(--text2)}
 .search-wrap{padding:12px 20px 0;flex-shrink:0}
 .search-wrap input{
-  width:100%;padding:8px 12px;
+  width:100%;padding:10px 14px;
   background:var(--bg2);border:1px solid var(--border2);
   border-radius:var(--radius);color:var(--text0);outline:none;
+  font-size:13px;
 }
 .search-wrap input:focus{border-color:var(--accent)}
 .search-wrap input::placeholder{color:var(--text2)}
@@ -106,13 +107,6 @@ button,input,select{font-family:inherit;font-size:inherit}
 }
 .price-tag.custom{color:var(--gold);border-color:rgba(240,192,96,.3)}
 .price-tag.loading{color:var(--text2);font-weight:400;font-size:11px}
-.global-search-btn{
-  width:100%;padding:7px 10px;margin-top:8px;
-  background:var(--bg3);border:1px solid var(--border2);
-  border-radius:var(--radius);cursor:pointer;color:var(--text1);
-  font-size:12px;text-align:left;transition:background .12s;
-}
-.global-search-btn:hover{background:var(--border2);color:var(--text0)}
 .add-btn{
   flex:1;height:28px;font-size:12px;font-weight:500;
   background:var(--bg3);border:1px solid var(--border2);
@@ -196,7 +190,6 @@ button,input,select{font-family:inherit;font-size:inherit}
 <div class="sidebar">
   <div class="sidebar-top">
     <div class="sidebar-title">Sets</div>
-    <button class="global-search-btn" onclick="openGlobalSearch()">🔍 Search all cards</button>
   </div>
   <div class="sidebar-scroll" id="sidebar-sets"></div>
   <div class="rarity-section">
@@ -208,11 +201,11 @@ button,input,select{font-family:inherit;font-size:inherit}
 <!-- ── Main ── -->
 <div class="main">
   <div class="main-header">
-    <h2 id="main-title">Select a set</h2>
-    <p id="main-sub">JP Wholesale Catalog</p>
+    <h2 id="main-title">JP Wholesale Catalog</h2>
+    <p id="main-sub">Select a set from the sidebar, or search all 8,546 cards below.</p>
   </div>
-  <div class="search-wrap" id="search-wrap" style="display:none">
-    <input type="text" id="search" placeholder="Search by name or number…" oninput="onSearch()">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="🔍  Search all cards — name (EN / JP) or card number…" oninput="onSearch()">
   </div>
   <div class="card-scroll">
     <div id="content"><div class="empty-state">Choose a set from the sidebar.</div></div>
@@ -247,21 +240,7 @@ button,input,select{font-family:inherit;font-size:inherit}
 
 </div><!-- .app -->
 
-<!-- ── Global Search Modal ── -->
-<div class="modal-overlay" id="global-search-modal">
-  <div class="modal" style="max-width:620px;width:94%;max-height:80vh;display:flex;flex-direction:column;padding:20px">
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-shrink:0">
-      <input type="text" id="global-search-input" class="buyer-input"
-             placeholder="Card name (EN/JP) or number…"
-             style="flex:1;margin:0;font-size:14px"
-             oninput="onGlobalSearch()">
-      <button class="modal-close" style="width:auto;margin:0;padding:8px 16px;flex-shrink:0"
-              onclick="closeGlobalSearch()">✕</button>
-    </div>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;flex-shrink:0" id="global-search-count"></div>
-    <div id="global-search-results" style="overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px"></div>
-  </div>
-</div>
+
 
 <!-- ── Confirmation Modal ── -->
 <div class="modal-overlay" id="modal">
@@ -528,31 +507,11 @@ function showModal(title, body){
 }
 function closeModal(){ document.getElementById('modal').classList.remove('show') }
 
-// ── Global Search ──
-let globalSearchTimer = null;
-
-function openGlobalSearch(){
-  document.getElementById('global-search-modal').classList.add('show');
-  setTimeout(()=>document.getElementById('global-search-input').focus(), 80);
-  document.getElementById('global-search-results').innerHTML='';
-  document.getElementById('global-search-count').textContent='Type to search across all 8,546 cards.';
-  document.getElementById('global-search-input').value='';
-}
-
-function closeGlobalSearch(){
-  document.getElementById('global-search-modal').classList.remove('show');
-}
-
-function onGlobalSearch(){
-  clearTimeout(globalSearchTimer);
-  globalSearchTimer = setTimeout(runGlobalSearch, 180);
-}
-
-function runGlobalSearch(){
-  const q = document.getElementById('global-search-input').value.toLowerCase().trim();
+// ── Global Search (inline in main area) ──
+function renderGlobalSearch(){
+  const q = searchQ;
   if(q.length < 2){
-    document.getElementById('global-search-results').innerHTML='';
-    document.getElementById('global-search-count').textContent='Type at least 2 characters.';
+    document.getElementById('content').innerHTML='<div class="empty-state">Type at least 2 characters to search all cards.</div>';
     return;
   }
   const results = [];
@@ -563,36 +522,37 @@ function runGlobalSearch(){
       }
     }
   }
-  const sym = getSym();
-  document.getElementById('global-search-count').textContent =
-    results.length ? `${results.length} cards found` : 'No results.';
-  document.getElementById('global-search-results').innerHTML =
-    results.slice(0,120).map(c=>{
-      const key=`${c.setId}-${c.n}`;
-      const price=getPrice(key,c.r);
-      const custom=isPriceCustom(key);
-      const tagClass=custom?'price-tag custom':'price-tag';
-      return `<div class="card-item">
-        <img class="card-img" src="${imgUrl(c.setId,c.n)}" alt="${c.en}" loading="lazy"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="card-img-ph" style="display:none">No image</div>
-        <div class="card-info">
-          <div class="card-num" style="font-size:10px;color:var(--text2)">${c.setId} #${c.n}</div>
-          <div class="card-en">${c.en}</div>
-          <div class="card-jp">${c.jp}</div>
-          <span class="rarity-badge ${rClass(c.r)}">${c.r}</span>
-          <div class="card-add">
-            <span class="${tagClass}">${sym}${conv(price)}</span>
-            <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${c.setId}');closeGlobalSearch()">Add</button>
-          </div>
-        </div></div>`;
-    }).join('');
+  if(!results.length){
+    document.getElementById('main-title').textContent='Search results';
+    document.getElementById('main-sub').textContent='0 cards found';
+    document.getElementById('content').innerHTML='<div class="empty-state">No cards found.</div>';
+    return;
+  }
+  const sym=getSym();
+  const shown=results.slice(0,200);
+  document.getElementById('main-title').textContent='Search results';
+  document.getElementById('main-sub').textContent=`${results.length} cards found${results.length>200?' (showing first 200)':''}`;
+  document.getElementById('content').innerHTML=`<div class="card-grid">${shown.map(c=>{
+    const key=`${c.setId}-${c.n}`;
+    const price=getPrice(key,c.r);
+    const custom=isPriceCustom(key);
+    const tagClass=custom?'price-tag custom':'price-tag';
+    return `<div class="card-item">
+      <img class="card-img" src="${imgUrl(c.setId,c.n)}" alt="${c.en}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="card-img-ph" style="display:none">No image</div>
+      <div class="card-info">
+        <div class="card-num">${c.setId} #${c.n}</div>
+        <div class="card-en">${c.en}</div>
+        <div class="card-jp">${c.jp}</div>
+        <span class="rarity-badge ${rClass(c.r)}">${c.r}</span>
+        <div class="card-add">
+          <span class="${tagClass}">${sym}${conv(price)}</span>
+          <button class="add-btn" onclick="addToCart('${key}','${c.en}','${c.jp}','${c.r}','${c.n}','${c.setId}')">Add</button>
+        </div>
+      </div></div>`;
+  }).join('')}</div>`;
 }
-
-// close on overlay click
-document.getElementById('global-search-modal').addEventListener('click', function(e){
-  if(e.target===this) closeGlobalSearch();
-});
 
 // ── Init ──
 renderSidebar();
