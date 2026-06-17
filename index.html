@@ -244,6 +244,95 @@ button,input,select{font-family:inherit;font-size:inherit}
 
 </div><!-- .app -->
 
+<!-- ── 買取モードオーバーレイ ── -->
+<div id="takatori-overlay" style="display:none;position:fixed;inset:0;background:var(--bg0);z-index:200;overflow-y:auto;padding:24px">
+
+  <div style="max-width:900px;margin:0 auto">
+
+    <!-- ヘッダー -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;margin-bottom:4px">管理者モード</div>
+        <h2 style="font-size:18px;font-weight:600;color:var(--text0)">買取バナージェネレーター</h2>
+      </div>
+      <button onclick="closeTakatori()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text1);padding:8px 16px;cursor:pointer;font-size:13px">← カタログに戻る</button>
+    </div>
+
+    <!-- 2カラムレイアウト -->
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start">
+
+      <!-- 左：スロット管理 -->
+      <div style="background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;margin-bottom:12px">カードスロット（最大9枚）</div>
+
+        <!-- 検索 -->
+        <input type="text" id="tak-search" placeholder="カード名で検索..." oninput="takSearchCards()"
+          style="width:100%;padding:8px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none;margin-bottom:10px">
+        <div id="tak-search-results" style="max-height:140px;overflow-y:auto;margin-bottom:14px;display:none;background:var(--bg2);border:1px solid var(--border);border-radius:6px"></div>
+
+        <!-- スロット一覧 -->
+        <div id="tak-slot-list" style="display:flex;flex-direction:column;gap:6px"></div>
+
+        <!-- 選択スロット編集 -->
+        <div id="tak-edit-form" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;margin-bottom:10px">スロット <span id="tak-slot-label"></span> を編集</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">カード名</div>
+          <input id="tak-f-name" type="text" placeholder="例: ピカチュウex SAR"
+            style="width:100%;padding:7px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none;margin-bottom:8px">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px">買取価格（数値）</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <select id="tak-f-currency" style="padding:7px 8px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none;-webkit-appearance:none">
+              <option value="¥">JPY ¥</option>
+              <option value="USD $">USD $</option>
+              <option value="SGD $">SGD $</option>
+              <option value="HKD $">HKD $</option>
+            </select>
+            <input id="tak-f-amount" type="number" placeholder="3500"
+              style="flex:1;padding:7px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="takSaveSlot()" style="flex:1;padding:8px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">保存</button>
+            <button onclick="takClearSlot()" style="padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-size:12px;cursor:pointer">クリア</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右：プレビュー -->
+      <div>
+        <!-- バナー設定 -->
+        <div style="background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;margin-bottom:10px">バナー設定</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:3px">サブテキスト</div>
+              <input id="tak-sub" type="text" value="Torelis Japan — JP版ポケモンカード卸"
+                style="width:100%;padding:7px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none">
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:3px">フッター</div>
+              <input id="tak-footer" type="text" value="LINE / WhatsApp でお問い合わせ"
+                style="width:100%;padding:7px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text0);font-size:12px;outline:none">
+            </div>
+          </div>
+          <button onclick="takRenderBanner()" style="margin-top:10px;width:100%;padding:10px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">バナーを生成</button>
+        </div>
+
+        <!-- バナープレビュー -->
+        <div style="background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;margin-bottom:12px">出力プレビュー</div>
+          <div id="tak-banner-output" style="background:#1a1a2e;border-radius:10px;padding:20px 22px 22px;font-family:'Helvetica Neue',Arial,'Noto Sans JP',sans-serif">
+            <div style="text-align:center;font-size:22px;font-weight:700;color:#FFD700;letter-spacing:.1em;margin-bottom:4px">トレカ高価買取</div>
+            <div id="tak-out-sub" style="text-align:center;font-size:11px;color:#99a0bb;margin-bottom:16px;letter-spacing:.05em">Torelis Japan — JP版ポケモンカード卸</div>
+            <div id="tak-banner-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+            <div id="tak-out-footer" style="margin-top:14px;text-align:center;font-size:10px;color:#666880;letter-spacing:.05em">LINE / WhatsApp でお問い合わせ</div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--text2)">※ HTMLとして保存・共有可能です</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
 <!-- ── Confirmation Modal ── -->
@@ -652,6 +741,136 @@ renderSidebar();
 renderCart();
 if(GAS_URL !== 'YOUR_GAS_WEBAPP_URL_HERE') loadPrices();
 else { pricesLoaded = true; }
+
+// ── Admin: 買取バナージェネレーター ──
+const TAK_SLOTS = 9;
+let takSlots = Array.from({length: 9}, () => ({name:'', img:'', currency:'¥', amount:0}));
+let takActive = null;
+
+function openTakatori(){
+  document.getElementById('takatori-overlay').style.display = 'block';
+  takRenderSlots();
+  takRenderBanner();
+}
+function closeTakatori(){
+  document.getElementById('takatori-overlay').style.display = 'none';
+}
+
+if(new URLSearchParams(location.search).get('admin') === '1') {
+  document.addEventListener('DOMContentLoaded', openTakatori);
+}
+
+function takRenderSlots(){
+  const list = document.getElementById('tak-slot-list');
+  if(!list) return;
+  list.innerHTML = takSlots.map((s,i) => `
+    <div onclick="takSelectSlot(${i})" style="
+      display:flex;align-items:center;gap:8px;padding:7px 10px;
+      background:${takActive===i ? 'var(--bg3)' : 'var(--bg2)'};
+      border:1px solid ${takActive===i ? 'var(--accent)' : 'var(--border)'};
+      border-radius:6px;cursor:pointer;transition:border-color .12s">
+      <span style="font-size:10px;color:var(--text2);min-width:16px;text-align:center;font-weight:600">${i+1}</span>
+      <div style="width:28px;height:38px;background:var(--bg1);border-radius:3px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+        ${s.img ? `<img src="${s.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : `<span style="font-size:10px;color:var(--text2)">—</span>`}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:500;color:${s.name ? 'var(--text0)' : 'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name || '(空き)'}</div>
+        <div style="font-size:10px;color:var(--text2)">${s.amount ? (s.currency || '¥') + Number(s.amount).toLocaleString() : '—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function takSelectSlot(i){
+  takActive = i;
+  const s = takSlots[i];
+  document.getElementById('tak-edit-form').style.display = 'block';
+  document.getElementById('tak-slot-label').textContent = i + 1;
+  document.getElementById('tak-f-name').value = s.name;
+  document.getElementById('tak-f-currency').value = s.currency || '¥';
+  document.getElementById('tak-f-amount').value = s.amount || '';
+  takRenderSlots();
+}
+
+function takSaveSlot(){
+  if(takActive === null) return;
+  const currency = document.getElementById('tak-f-currency').value;
+  const amount = parseInt(document.getElementById('tak-f-amount').value) || 0;
+  const name = document.getElementById('tak-f-name').value.trim();
+  takSlots[takActive] = {...takSlots[takActive], name, currency, amount};
+  takRenderSlots();
+  takRenderBanner();
+}
+
+function takClearSlot(){
+  if(takActive === null) return;
+  takSlots[takActive] = {name:'', img:'', currency:'¥', amount:0};
+  document.getElementById('tak-f-name').value = '';
+  document.getElementById('tak-f-amount').value = '';
+  takRenderSlots();
+  takRenderBanner();
+}
+
+function takSearchCards(){
+  const q = document.getElementById('tak-search').value.toLowerCase().trim();
+  const res = document.getElementById('tak-search-results');
+  if(q.length < 2){ res.style.display='none'; return; }
+  const hits = [];
+  for(const [setId, cards] of Object.entries(CARDS)){
+    for(const c of cards){
+      if(c.en.toLowerCase().includes(q) || c.jp.includes(q)){
+        hits.push({...c, setId});
+        if(hits.length >= 20) break;
+      }
+    }
+    if(hits.length >= 20) break;
+  }
+  if(!hits.length){ res.style.display='none'; return; }
+  res.style.display = 'block';
+  res.innerHTML = hits.map(c => {
+    const enSafe = c.en.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const jpSafe = c.jp.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div onclick="takAssignCard('${c.setId}','${c.n}','${enSafe}','${jpSafe}','${c.r}')"
+      style="padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <span style="font-weight:500;color:var(--text0)">${c.en}</span>
+      <span style="color:var(--text2);margin-left:6px">${c.jp}</span>
+      <span style="float:right;font-size:10px;color:var(--text2)">${c.setId} #${c.n}</span>
+    </div>`;
+  }).join('');
+}
+
+function takAssignCard(setId, n, en, jp, r){
+  if(takActive === null) return;
+  const img = imgUrl(setId, n);
+  takSlots[takActive] = {...takSlots[takActive], name: en, img, setId, n};
+  document.getElementById('tak-f-name').value = en;
+  document.getElementById('tak-search').value = '';
+  document.getElementById('tak-search-results').style.display = 'none';
+  takRenderSlots();
+  takRenderBanner();
+}
+
+function takRenderBanner(){
+  const grid = document.getElementById('tak-banner-grid');
+  if(!grid) return;
+  const sub = document.getElementById('tak-sub')?.value || '';
+  const footer = document.getElementById('tak-footer')?.value || '';
+  document.getElementById('tak-out-sub').textContent = sub;
+  document.getElementById('tak-out-footer').textContent = footer;
+  grid.innerHTML = takSlots.map(s => `
+    <div style="background:#252540;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid #383870">
+      <div style="width:100%;aspect-ratio:2/3;background:#1a1a2e;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+        ${s.img
+          ? `<img src="${s.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='<span style=font-size:20px;color:#555580>？</span>'">`
+          : `<span style="font-size:20px;color:#555580">＋</span>`}
+      </div>
+      <div style="font-size:10px;color:#c8cce0;text-align:center;line-height:1.3;min-height:28px;display:flex;align-items:center;justify-content:center">${s.name || '—'}</div>
+      <div style="background:${s.amount ? '#FFD700' : 'rgba(255,215,0,0.25)'};color:${s.amount ? '#1a1a2e' : '#777'};font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap">
+        ${s.amount ? (s.currency || '¥') + Number(s.amount).toLocaleString() : '未設定'}
+      </div>
+    </div>`).join('');
+}
+
 </script>
 </body>
 </html>
