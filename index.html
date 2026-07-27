@@ -562,7 +562,10 @@ function isPriceCustom(key){ return cardPrices[key] !== undefined; }
 // ── Helpers ──
 function getSym(){return {USD:'$',SGD:'S$',HKD:'HK$',JPY:'¥',PHP:'₱'}[document.getElementById('currency').value]||'$'}
 function conv(u){return (u * (FX[document.getElementById('currency').value]||1)).toFixed(2)}
-function imgUrl(s,n){return `https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/${s}/${s}_${n}_R_JP_LG.png`}
+function imgUrl(s,n){
+  if(/-P$/i.test(s)) return `images/promo/${s}/${s}_${n}.webp`;
+  return `https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/${s}/${s}_${n}_R_JP_LG.png`;
+}
 function rClass(r){return 'r-'+r.replace(/\s+/g,'-')}
 
 // ── Sidebar ──
