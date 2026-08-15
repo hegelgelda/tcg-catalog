@@ -1,0 +1,22 @@
+{
+  "updated_at": "2026-08-16T06:12:15+09:00",
+  "columns": [
+    "recorded_at",
+    "batch_id",
+    "title",
+    "set_id",
+    "card_no",
+    "name",
+    "rarity",
+    "currency",
+    "amount",
+    "psa10"
+  ],
+  "months": [
+    {
+      "month": "2026-08",
+      "rows": 1,
+      "file": "2026-08.csv"
+    }
+  ]
+}
