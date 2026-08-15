@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-16T06:30:19+09:00",
+  "updated_at": "2026-08-16T06:49:15+09:00",
   "columns": [
     "recorded_at",
     "batch_id",
@@ -12,10 +12,24 @@
     "amount",
     "psa10"
   ],
+  "current": {
+    "file": "current.csv",
+    "columns": [
+      "set_id",
+      "card_no",
+      "name",
+      "rarity",
+      "currency",
+      "amount",
+      "psa10",
+      "updated_at",
+      "records"
+    ]
+  },
   "months": [
     {
       "month": "2026-08",
-      "rows": 24,
+      "rows": 47,
       "file": "2026-08.csv"
     }
   ]
