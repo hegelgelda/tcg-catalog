@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-16T06:49:15+09:00",
+  "updated_at": "2026-08-16T10:27:40+09:00",
   "columns": [
     "recorded_at",
     "batch_id",
@@ -10,11 +10,13 @@
     "rarity",
     "currency",
     "amount",
-    "psa10"
+    "psa10",
+    "game"
   ],
   "current": {
     "file": "current.csv",
     "columns": [
+      "game",
       "set_id",
       "card_no",
       "name",
@@ -29,7 +31,7 @@
   "months": [
     {
       "month": "2026-08",
-      "rows": 47,
+      "rows": 59,
       "file": "2026-08.csv"
     }
   ]
