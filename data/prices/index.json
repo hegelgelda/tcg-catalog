@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-18T20:19:38+09:00",
+  "updated_at": "2026-08-29T15:04:27+09:00",
   "columns": [
     "recorded_at",
     "batch_id",
@@ -31,7 +31,7 @@
   "months": [
     {
       "month": "2026-08",
-      "rows": 363,
+      "rows": 391,
       "file": "2026-08.csv"
     }
   ]
